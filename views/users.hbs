@@ -1,0 +1,15 @@
+<div class="container pt-5">
+
+  <h1 class="text-center mb-5">Выберите пользователя</h1>
+  <div class="row justify-content-md-center">
+    {{#each users}}
+      <div class="card bg-dark text-light m-3 text-center" style="width: 18rem;">
+        <div class="box"><img src={{avatar}} class="card-img-top img-fluid" alt="..." /></div>
+        <div class="card-body">
+          <h5 class="card-title mb-3">{{name}}</h5>
+          <a href="/books/user/{{_id}}" class="btn btn-primary">Выбрать</a>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+</div>

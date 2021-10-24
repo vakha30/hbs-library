@@ -3,16 +3,16 @@ const Review = require("../models/Review.model");
 module.exports.reviewsController = {
   getAllreviews: async (req, res) => {
     try {
-      const reviews = await Review.find().lean();
+      const reviews = await Review.find().populate("user book").lean();
       return res.json(reviews);
     } catch (error) {
       console.log(error);
       res.json({ message: "Server error", error });
     }
   },
-  getRReviewsByBook: async (req, res) => {
+  getReviewsByBook: async (req, res) => {
     try {
-      const reviews = await Review.find({ book: req.params.bookId }).lean();
+      const reviews = await Review.find({ book: req.params.bookId }).populate("user book").lean();
       return res.json(reviews);
     } catch (error) {
       console.log(error);
@@ -21,7 +21,7 @@ module.exports.reviewsController = {
   },
   getOneReview: async (req, res) => {
     try {
-      const review = await Review.findById(req.params.id).lean();
+      const review = await Review.findById(req.params.id).populate("user book").lean();
       return res.json(review);
     } catch (error) {
       console.log(error);
@@ -30,12 +30,15 @@ module.exports.reviewsController = {
   },
   addReview: async (req, res) => {
     try {
+      if (req.body.text === "") {
+        return res.redirect(`/books/user/${req.params.userId}/book/${req.params.bookId}`);
+      }
       const review = await Review.create({
         text: req.body.text,
         user: req.params.userId,
         book: req.params.bookId,
       });
-      return res.json({ message: "Комментарий добавлен", review });
+      return res.redirect(`/books/user/${req.params.userId}/book/${req.params.bookId}`);
     } catch (error) {
       console.log(error);
       res.json({ message: "Server error", error });

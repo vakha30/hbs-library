@@ -1,0 +1,49 @@
+<header>
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/books/user/{{userId}}">Books Library</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/books/user/{{userId}}">Главная</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/users/user/{{userId}}">Профиль</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/">Выход</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="bg-dark">
+    <div class="container">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="/books/user/{{userId}}">Все</a>
+        </li>
+        {{#each categories}}
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              aria-current="page"
+              href="/books/user/{{userId}}/category/{{_id}}"
+            >{{name}}</a>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+</header>

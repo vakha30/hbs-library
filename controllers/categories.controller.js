@@ -4,7 +4,8 @@ module.exports.categoriesController = {
   getAllCategories: async (req, res) => {
     try {
       const categories = await Category.find().lean();
-      return res.json(categories);
+      categories.forEach((item) => (item.userId = req.params.userId));
+      return res.render("category-page", { categories, userId: req.params.userId });
     } catch (error) {
       console.log(error);
       res.json({ message: "Server error", error });

@@ -3,8 +3,10 @@ const { usersController } = require("../controllers/users.controller");
 
 const router = Router();
 
-router.get("/admin/", usersController.getAllUsers);
-router.get("/admin/user/:userId", usersController.getOneUser);
+router.get("/", usersController.getAllUsers);
+router.get("/user/:userId", usersController.getOneUser);
+router.get("/admin/", usersController.getAllUsersForAdmin);
+router.get("/admin/user/:userId", usersController.getOneUserForAdmin);
 router.get("/admin/user/:userId/block", usersController.blockUser);
 router.get("/admin/user/:userId/unblock", usersController.unblockUser);
 

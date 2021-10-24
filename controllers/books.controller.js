@@ -1,11 +1,18 @@
 const Book = require("../models/Book.model");
 const User = require("../models/User.model");
+const Category = require("../models/Category.model");
+const Review = require("../models/Review.model");
 
 module.exports.booksController = {
   getAllBooks: async (req, res) => {
     try {
       const books = await Book.find().lean();
-      return res.json(books);
+      const categories = await Category.find().lean();
+
+      categories.forEach((item) => (item.userId = req.params.userId));
+      books.forEach((item) => (item.userId = req.params.userId));
+
+      return res.render("books", { books, categories, userId: req.params.userId });
     } catch (error) {
       console.log(error);
       res.json({ message: "Server error", error });
@@ -14,7 +21,12 @@ module.exports.booksController = {
   getBooksByCategory: async (req, res) => {
     try {
       const books = await Book.find({ category: req.params.categoryId }).lean();
-      return res.json(books);
+      const categories = await Category.find().lean();
+
+      categories.forEach((item) => (item.userId = req.params.userId));
+      books.forEach((item) => (item.userId = req.params.userId));
+
+      return res.render("books", { books, categories, userId: req.params.userId });
     } catch (error) {
       console.log(error);
       res.json({ message: "Server error", error });
@@ -23,7 +35,13 @@ module.exports.booksController = {
   getOnedBook: async (req, res) => {
     try {
       const book = await Book.findById(req.params.bookId).lean();
-      return res.json(book);
+      const categories = await Category.find().lean();
+      const reviews = await Review.find({ book: req.params.bookId }).populate("user").lean();
+      categories.forEach((item) => (item.userId = req.params.userId));
+      book.comments = reviews;
+
+      book.userId = req.params.userId;
+      return res.render("one-book", { book, categories, userId: req.params.userId });
     } catch (error) {
       console.log(error);
       res.json({ message: "Server error", error });
@@ -33,9 +51,15 @@ module.exports.booksController = {
     try {
       const book = await Book.findById(req.params.bookId).lean();
       const user = await User.findById(req.params.userId).lean();
+      const categories = await Category.find().lean();
+      const reviews = await Review.find({ book: req.params.bookId }).populate("user").lean();
 
       if (user.isBlocked) {
-        return res.json({ message: "Вы забанены" });
+        categories.forEach((item) => (item.userId = req.params.userId));
+        book.comments = reviews;
+        book.userId = req.params.userId;
+        book.isBlocked = true;
+        return res.render("one-book", { book, categories, userId: req.params.userId });
       }
 
       if (book.isArend) {
@@ -43,13 +67,31 @@ module.exports.booksController = {
       }
 
       if (user.arendBooks.length >= 3) {
-        return res.json({ message: "Можноиметь только 3 книги" });
+        categories.forEach((item) => (item.userId = req.params.userId));
+        book.comments = reviews;
+        book.userId = req.params.userId;
+        book.limit = true;
+        return res.render("one-book", { book, categories, userId: req.params.userId });
       }
 
-      await Book.findByIdAndUpdate(req.params.bookId, { isArend: true });
+      await Book.findByIdAndUpdate(req.params.bookId, { isArend: true, user: req.params.userId });
       await User.findByIdAndUpdate(req.params.userId, { $push: { arendBooks: req.params.bookId } });
 
-      return res.json({ message: "Книга арендованна", book });
+      return res.redirect(`/books/user/${req.params.userId}/book/${req.params.bookId}`);
+    } catch (error) {
+      console.log(error);
+      res.json({ message: "Server error", error });
+    }
+  },
+  passRentBook: async (req, res) => {
+    try {
+      const book = await Book.findById(req.params.bookId).lean();
+      const user = await User.findById(req.params.userId).lean();
+
+      await Book.findByIdAndUpdate(req.params.bookId, { isArend: false });
+      await User.findByIdAndUpdate(req.params.userId, { $pull: { arendBooks: req.params.bookId } });
+
+      return res.redirect(`/users/user/${req.params.userId}`);
     } catch (error) {
       console.log(error);
       res.json({ message: "Server error", error });

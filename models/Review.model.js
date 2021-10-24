@@ -10,6 +10,10 @@ const reviewSchema = Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 const Review = model("Review", reviewSchema);
