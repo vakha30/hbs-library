@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const exphbs = require("express-handlebars");
 const bodyParser = require("body-parser");
 const path = require("path");
+const config = require("config");
 
 const PORT = process.env.PORT || 5000;
-const dbUrl = "mongodb+srv://gvardeez95:stalker95@products.yiuz2.mongodb.net/hbs_books_cump_db";
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use(express.static(path.resolve(__dirname, "public")));
 app.use(require("./routes"));
 
 const start = async () => {
-  await mongoose.connect(dbUrl);
+  await mongoose.connect(config.get("dbUrl"));
 
   app.listen(PORT, () => {
     console.log("Server has been started on port", PORT);
